@@ -10,6 +10,7 @@
 
     <string name="button_download">Download</string>
     <string name="button_loading">We are loading </string>
+    <string name="button_completed">Completed! </string>
     <string name="radiobutton1">Glide - Image Loading Library by BumpTech</string>
     <string name="radiobutton2">LoadApp - Current repository by Udacity</string>
     <string name="radiobutton3">Retrofit - Type-safe HTTP client for Android and\nJava by Square, Inc</string>

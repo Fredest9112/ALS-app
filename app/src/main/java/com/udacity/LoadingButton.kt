@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
@@ -20,6 +21,10 @@ class LoadingButton @JvmOverloads constructor(
     private val paintLoadingButton = Paint(
         Paint.ANTI_ALIAS_FLAG
     )
+    private val paintOverlappedRec = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = context.getColor(R.color.colorPrimaryDark)
+    }
+    private var progressLevel = 0f
 
     //Set variables for text message on loading button
     private val paintTextMessage = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -34,24 +39,73 @@ class LoadingButton @JvmOverloads constructor(
     private var paintArcLoading = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = context.getColor(R.color.colorAccent)
     }
+    private var progressAngle = 0F
 
     private var rectSupForArcLoading = RectF()
     private val arcSize = 50
 
-    private val valueAnimator = ValueAnimator()
+    private val circleAnimation = ObjectAnimator()
+    private val loadingButtonAnimation = ObjectAnimator()
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
+    var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
+        when (new) {
+            ButtonState.Loading -> {
+                textBtnStatus = context.getString(R.string.button_loading)
+                loadingButtonAnimation.apply {
+                    setObjectValues(0F, 3600F)
+                    duration = 2000
+                    repeatMode = ObjectAnimator.REVERSE
+                    repeatCount = ObjectAnimator.INFINITE
+                    addUpdateListener {
+                        progressLevel = animatedValue as Float
+                        this@LoadingButton.postInvalidate()
+                    }
+                    start()
+                }
 
+                circleAnimation.apply {
+                    setObjectValues(0f, 3600f)
+                    duration = 2000
+                    repeatMode = ObjectAnimator.REVERSE
+                    repeatCount = ObjectAnimator.INFINITE
+                    addUpdateListener {
+                        progressAngle = animatedValue as Float
+                        this@LoadingButton.postInvalidate()
+                    }
+                    start()
+                }
+            }
+
+            ButtonState.Completed -> {
+                textBtnStatus = context.getString(R.string.button_completed)
+                loadingButtonAnimation.end()
+                circleAnimation.end()
+            }
+
+            else -> {
+                ButtonState.Pending
+                textBtnStatus = context.getString(R.string.button_download)
+            }
+        }
     }
 
 
     init {
+        isClickable = true
+        buttonState = ButtonState.Pending
         context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
             paintLoadingButton.color = getColor(R.styleable.LoadingButton_loading_button_color, 0)
         }
         paintLoadingButton.color = context.getColor(R.color.colorPrimary)
         paintTextMessage.color = context.getColor(R.color.white)
         textBtnStatus = context.getString(R.string.button_download)
+    }
+
+    override fun performClick(): Boolean {
+        buttonState = ButtonState.Loading
+        postInvalidate()
+        if (super.performClick()) return true
+        return true
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -64,8 +118,9 @@ class LoadingButton @JvmOverloads constructor(
             (height / 2f) + arcSize
         )
         canvas?.drawRect(loadingButton, paintLoadingButton)
+        canvas?.drawRect(0f, 10f, progressLevel - 10, height.toFloat() - 10, paintOverlappedRec)
         canvas?.drawText(textBtnStatus, width / 2f, (height / 2f) + textOffset, paintTextMessage)
-        canvas?.drawArc(rectSupForArcLoading, 0f, 270f, true, paintArcLoading)
+        canvas?.drawArc(rectSupForArcLoading, 0f, progressAngle, true, paintArcLoading)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
