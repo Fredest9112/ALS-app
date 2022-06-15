@@ -1,5 +1,7 @@
 package com.udacity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
@@ -8,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.core.content.withStyledAttributes
+import kotlinx.android.synthetic.main.content_main.view.*
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -70,6 +73,7 @@ class LoadingButton @JvmOverloads constructor(
                         progressLevel = animatedValue as Float
                         this@LoadingButton.postInvalidate()
                     }
+                    disableViewDuringAnimation(custom_button)
                     start()
                 }
 
@@ -100,6 +104,18 @@ class LoadingButton @JvmOverloads constructor(
                 textBtnStatus = context.getString(R.string.button_download)
             }
         }
+    }
+
+    private fun ValueAnimator.disableViewDuringAnimation(view: View){
+        addListener(object: AnimatorListenerAdapter(){
+            override fun onAnimationStart(animation: Animator?) {
+                view.isEnabled = false
+            }
+
+            override fun onAnimationEnd(animation: Animator?) {
+                view.isEnabled = true
+            }
+        })
     }
 
 
