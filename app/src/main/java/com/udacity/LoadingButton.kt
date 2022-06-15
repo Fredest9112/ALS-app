@@ -44,15 +44,25 @@ class LoadingButton @JvmOverloads constructor(
     private var rectSupForArcLoading = RectF()
     private val arcSize = 50
 
-    private val circleAnimation = ObjectAnimator()
-    private val loadingButtonAnimation = ObjectAnimator()
+    //Set animators for custom views
+    private lateinit var circleAnimation: ValueAnimator
+    private lateinit var loadingButtonAnimation: ValueAnimator
+
+    /*
+    Got some help from:
+    https://github.com/AntonLearnsCS/AnimationPracticeApp/blob/master/starter/app/src/main/java/com/udacity/LoadingButton.kt
+    https://github.com/jiangxiaocn/LoadApp/blob/main/starter/app/src/main/java/com/udacity/LoadingButton.kt
+     */
 
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
         when (new) {
             ButtonState.Loading -> {
                 textBtnStatus = context.getString(R.string.button_loading)
+                /* Since width can vary based on device display,
+                    we can animate the width as a fraction of it's calculated width.
+                    Hence we will need animated values from 0 to 1 fraction */
+                loadingButtonAnimation = ObjectAnimator.ofFloat(0f, 1f)
                 loadingButtonAnimation.apply {
-                    setObjectValues(0F, 3600F)
                     duration = 2000
                     repeatMode = ObjectAnimator.REVERSE
                     repeatCount = ObjectAnimator.INFINITE
@@ -63,8 +73,11 @@ class LoadingButton @JvmOverloads constructor(
                     start()
                 }
 
+                /* Since the arc is mainly drawn with radius and sweep angle
+                    and in our case we want to animate the angle, it should go
+                    from 0 to full 360 degrees */
+                circleAnimation = ObjectAnimator.ofFloat(0f, 360f)
                 circleAnimation.apply {
-                    setObjectValues(0f, 3600f)
                     duration = 2000
                     repeatMode = ObjectAnimator.REVERSE
                     repeatCount = ObjectAnimator.INFINITE
@@ -118,7 +131,13 @@ class LoadingButton @JvmOverloads constructor(
             (height / 2f) + arcSize
         )
         canvas?.drawRect(loadingButton, paintLoadingButton)
-        canvas?.drawRect(0f, 10f, progressLevel - 10, height.toFloat() - 10, paintOverlappedRec)
+        canvas?.drawRect(
+            0f,
+            10f,
+            progressLevel * width.toFloat() - 10,
+            height.toFloat() - 10,
+            paintOverlappedRec
+        )
         canvas?.drawText(textBtnStatus, width / 2f, (height / 2f) + textOffset, paintTextMessage)
         canvas?.drawArc(rectSupForArcLoading, 0f, progressAngle, true, paintArcLoading)
     }
