@@ -131,7 +131,7 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     override fun performClick(): Boolean {
-        buttonState = ButtonState.Loading
+        //buttonState = ButtonState.Loading
         postInvalidate()
         if (super.performClick()) return true
         return true
