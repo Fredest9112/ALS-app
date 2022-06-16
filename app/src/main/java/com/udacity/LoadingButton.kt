@@ -106,8 +106,8 @@ class LoadingButton @JvmOverloads constructor(
         }
     }
 
-    private fun ValueAnimator.disableViewDuringAnimation(view: View){
-        addListener(object: AnimatorListenerAdapter(){
+    private fun ValueAnimator.disableViewDuringAnimation(view: View) {
+        addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 view.isEnabled = false
             }

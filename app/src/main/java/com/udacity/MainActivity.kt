@@ -4,7 +4,6 @@ import android.app.DownloadManager
 import android.app.DownloadManager.COLUMN_STATUS
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,10 +12,8 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -26,10 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private var downloadID: Long = 0
     private var url = ""
-
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
+    private var filename = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,12 +46,15 @@ class MainActivity : AppCompatActivity() {
 
         glideRB.setOnClickListener {
             url = GLIDE
+            filename = glideRB.text.toString()
         }
         loadappRB.setOnClickListener {
             url = LOAD_APP
+            filename = loadappRB.text.toString()
         }
         retrofitRB.setOnClickListener {
             url = RETROFIT
+            filename = retrofitRB.text.toString()
         }
 
         createChannel(
@@ -67,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createChannel(channelId: String, channelName: String) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(
                 channelId,
                 channelName,
@@ -78,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.RED
             notificationChannel.enableVibration(true)
-            notificationChannel.description = "checking notification"
+            notificationChannel.description = getString(R.string.notification_description)
             val notificationManager = this.getSystemService(
                 NotificationManager::class.java
             )
@@ -86,39 +83,48 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //Got some help from
+    //https://github.com/jiangxiaocn/LoadApp/blob/main/starter/app/src/main/java/com/udacity/MainActivity.kt
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
-            //val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+
             val action = intent?.action
             val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             val notificationManager = ContextCompat.getSystemService(
                 context,
                 NotificationManager::class.java
             ) as NotificationManager
-            if(action == DownloadManager.ACTION_DOWNLOAD_COMPLETE){
+            if (action == DownloadManager.ACTION_DOWNLOAD_COMPLETE) {
                 val cursor = downloadManager.query(
                     DownloadManager
                         .Query()
-                        .setFilterById(0L)
+                        .setFilterById(downloadID)
                 )
-                if(cursor.moveToFirst()){
+                if (cursor.moveToFirst() && cursor.count > 0) {
                     val status = cursor.getInt(cursor.getColumnIndex(COLUMN_STATUS))
-                    if(status == DownloadManager.STATUS_SUCCESSFUL){
+                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         custom_button.buttonState = ButtonState.Completed
                         notificationManager.sendNotification(
                             context.getString(R.string.download_success),
+                            filename,
                             context
                         )
-                    } else{
+                    } else {
                         custom_button.buttonState = ButtonState.Completed
                         notificationManager.sendNotification(
-                            context.getString(R.string.download_success),
+                            context.getString(R.string.download_failure),
+                            filename,
                             context
                         )
                     }
+                } else {
+                    custom_button.buttonState = ButtonState.Completed
+                    notificationManager.sendNotification(
+                        context.getString(R.string.download_failure),
+                        filename,
+                        context
+                    )
                 }
-            } else{
-                Log.i("action","incompleted")
             }
         }
     }

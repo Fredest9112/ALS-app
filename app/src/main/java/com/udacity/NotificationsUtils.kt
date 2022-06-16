@@ -7,10 +7,14 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 
 const val NOTIFICATION_ID = 0
+const val FILE_STATUS = "status"
+const val FILE_NAME = "filename"
 
-fun NotificationManager.sendNotification(message: String, context: Context) {
+fun NotificationManager.sendNotification(message: String, filename: String, context: Context) {
 
-    val contentIntent = Intent(context, MainActivity::class.java)
+    val contentIntent = Intent(context, DetailActivity::class.java)
+    contentIntent.putExtra(FILE_STATUS, message)
+    contentIntent.putExtra(FILE_NAME, filename)
 
     val contentPendingIntent = PendingIntent.getActivity(
         context,
@@ -23,7 +27,7 @@ fun NotificationManager.sendNotification(message: String, context: Context) {
         context,
         context.getString(R.string.download_notification_channel_id)
     ).setSmallIcon(R.drawable.ic_baseline_cloud_download_24)
-        .setContentTitle("Test")
+        .setContentTitle(context.getString(R.string.notification_title))
         .setContentText(message)
         .setContentIntent(contentPendingIntent)
         .setAutoCancel(true)

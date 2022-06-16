@@ -52,9 +52,9 @@
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_margin="20dp"
-        app:loading_button_color="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:loading_button_color="@color/colorPrimary" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
