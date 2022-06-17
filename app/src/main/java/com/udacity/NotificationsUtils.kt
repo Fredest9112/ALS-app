@@ -29,6 +29,8 @@ fun NotificationManager.sendNotification(message: String, filename: String, cont
     ).setSmallIcon(R.drawable.ic_baseline_cloud_download_24)
         .setContentTitle(context.getString(R.string.notification_title))
         .setContentText(message)
+        .addAction(R.drawable.ic_baseline_cloud_download_24,
+            context.getString(R.string.notification_button), contentPendingIntent)
         .setContentIntent(contentPendingIntent)
         .setAutoCancel(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)

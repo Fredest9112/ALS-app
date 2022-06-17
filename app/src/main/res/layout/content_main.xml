@@ -55,6 +55,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:loading_button_color="@color/colorPrimary" />
+        app:loading_button_color="@color/colorPrimary"
+        app:circle_loading_color="@color/colorAccent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

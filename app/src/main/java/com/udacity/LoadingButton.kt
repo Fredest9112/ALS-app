@@ -39,9 +39,7 @@ class LoadingButton @JvmOverloads constructor(
     private val textOffset = (textHeight / 2) - paintTextMessage.descent()
 
     //Set variables for circle loading on loading button
-    private var paintArcLoading = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = context.getColor(R.color.colorAccent)
-    }
+    private var paintArcLoading = Paint(Paint.ANTI_ALIAS_FLAG)
     private var progressAngle = 0F
 
     private var rectSupForArcLoading = RectF()
@@ -124,6 +122,7 @@ class LoadingButton @JvmOverloads constructor(
         buttonState = ButtonState.Pending
         context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
             paintLoadingButton.color = getColor(R.styleable.LoadingButton_loading_button_color, 0)
+            paintArcLoading.color = getColor(R.styleable.LoadingButton_circle_loading_color, 0)
         }
         paintLoadingButton.color = context.getColor(R.color.colorPrimary)
         paintTextMessage.color = context.getColor(R.color.white)
