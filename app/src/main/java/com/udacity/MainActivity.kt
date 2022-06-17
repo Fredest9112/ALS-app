@@ -30,6 +30,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        /*
+        You can register and unregister the receiver in onStart and onStop methods
+        respectively to avoid any memory leaks. Receiver will keep an implicit reference
+        to the Activity and hence Activity will not be cleared even after onDestroy is called.
+         */
+
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
         custom_button.setOnClickListener {
             when {
